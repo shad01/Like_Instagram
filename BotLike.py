@@ -1,5 +1,6 @@
 from time import sleep
 from selenium import webdriver
+from selenium.common.exceptions import ElementClickInterceptedException
 import pyautogui
 
 
@@ -12,7 +13,7 @@ class Instagram(object):
         
     def login(self):
         self.browser.get("https://www.instagram.com/")
-        sleep(3)
+        sleep(2)
         connect = self.browser.find_element_by_link_text("Conecte-se").click()
         sleep(3)
         user = self.browser.find_element_by_name("username")
@@ -25,39 +26,30 @@ class Instagram(object):
         sleep(7)
         #procura pelo o 'explore'
         explore = self.browser.find_element_by_class_name(
-            """Szr5J.kIKUG.coreSpriteDesktopNavExplore""")
+            """glyphsSpriteSafari__outline__24__grey_9.u-__7""")
         #clica no 'explore'
         explore.click()
         sleep(3)
-        i = 0 
-        g = 1
-        while True:
+        #procura pela imagem
+        hrefs = self.browser.find_elements_by_tag_name("a")
+        href = [h.get_attribute("href") for h in hrefs]
+        imgs = [img for img in href if img[26:30] == 'p/Br']
+        print(len(imgs))
+        for a in imgs:
             try:
-                sleep(2)
-                i += 1
-                #procura pela imagem
-                img = self.browser.find_element_by_xpath(f"""/html/body/span/
-                    section/main/div/article/div[1]/div/div[{g}]/div[{i}]""")
-                #clica na imagem encontrada
-                [img.click() for x in range(2)] 
-                sleep(1)
-                #Dá o like na foto 
+                #abri a imagem
+                self.browser.get(a)
+                #botão curtir
                 dá_like = self.browser.find_element_by_class_name(
-                    """dCJp8.afkep.coreSpriteHeartOpen._0mzm-""").click()
-                if i == 3:
-                    i = 0
-                    g += 1
-            except Exception:
+                    """dCJp8.afkep.coreSpriteHeartOpen._0mzm-""")
+                #curti a imagem
+                dá_like.click()
+            except ElementClickInterceptedException:
                 print("Falhou")
-            finally:
-                #utiliza o botão de voltar do browser
-                self.browser.back()
-                #faz o scroll(boto do meio do mouse) descer
-                pyautogui.scroll(-300)
-                
+
 
 user = str(input("Email: "))
 senha = str(input("Senha: "))
 insta = Instagram(user, senha)
-insta.login()
+insta.login() 
 insta.like()
