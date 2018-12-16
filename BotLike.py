@@ -1,7 +1,7 @@
 from time import sleep
 from selenium import webdriver
 from selenium.common.exceptions import ElementClickInterceptedException
-
+import getpass
 
 class Instagram(object):
 
@@ -47,7 +47,7 @@ class Instagram(object):
 
 
 user = str(input('Email: '))
-senha = str(input('Senha: '))
+senha = getpass.getpass('Senha: ')
 insta = Instagram(user, senha)
 insta.login() 
 insta.like()
